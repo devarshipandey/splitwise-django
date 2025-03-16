@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="form-container">
+    <h2>Create New Expense</h2>
+    <form method="post" novalidate>
+        {% csrf_token %}
+
+         <!-- Add error display at top -->
+         {% if error %}
+         <div class="alert alert-danger mb-4">
+             <strong>Error:</strong> {{ error }}
+         </div>
+         {% endif %} 
+        
+        <div class="form-group">
+            <label>Expense Name *</label>
+            <input type="text" name="name" class="form-control" 
+                   value="{{ form_data.name }}" required placeholder="Dinner at Restaurant">
+            {% if error and 'name' in error %}
+                <div class="form-error">{{ error.name }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>Amount (₹) *</label>
+            <input type="number" name="amount" class="form-control"
+                   value="{{ form_data.amount }}" step="0.01" min="1" required placeholder="500.00">
+                   
+            {% if error and 'amount' in error %}
+                <div class="form-error">{{ error.amount }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control"
+                      placeholder="Optional description">{{ request.POST.description }}</textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label>Paid By *</label>
+                <select name="paid_by" class="form-control" required>
+                    <option value="{{ user.email }}" selected>
+                        {{ user.name }} (You)
+                    </option>
+                    {% for participant in users %}
+                        <option value="{{ participant.email }}"
+                            {% if request.POST.paid_by == participant.email %}selected{% endif %}>
+                            {{ participant.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+                {% if error and 'paid_by' in error %}
+                    <div class="form-error">{{ error.paid_by }}</div>
+                {% endif %}
+            </div>
+
+            <div class="form-group col-md-6">
+                <label>Group (optional)</label>
+                <select name="group_name" class="form-control">
+                    <option value="">No Group</option>
+                    {% for group in groups %}
+                        <option value="{{ group.group_name }}"
+                            {% if request.POST.group_name == group.group_name %}selected{% endif %}>
+                            {{ group.group_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Participants *</label>
+            <div class="participant-note">
+                <small>(You are automatically included as a participant)</small>
+            </div>
+            <div class="participant-list">
+                {% for participant in users %}
+                    <div class="participant-option">
+                        <label>
+                            <input type="checkbox" name="participants" 
+                                   value="{{ participant.email }}"
+                                   {% if participant.email in request.POST.participants %}checked{% endif %}>
+                            {{ participant.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if error and 'participants' in error %}
+                <div class="form-error">{{ error.participants }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-plus-circle"></i> Create Expense
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                Cancel
+            </a>
+        </div>
+
+        {% if error and 'non_field_errors' in error %}
+            <div class="alert alert-danger mt-3">
+                {{ error.non_field_errors }}
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="profile-container">
+    <h2>User Profile</h2>
+    
+    <div class="profile-info">
+        <div class="profile-item">
+            <span class="label">Name:</span>
+            <span class="value">{{ user.name }}</span>
+        </div>
+        <div class="profile-item">
+            <span class="label">Email:</span>
+            <span class="value">{{ user.email }}</span>
+        </div>
+    </div>
+
+    {% comment %} <div class="debt-summary">
+        <h3>Financial Summary</h3>
+        <div class="summary-item">
+            <span class="label">Total Credit:</span>
+            <span class="value positive">₹{{ credit }}</span>
+        </div>
+        <div class="summary-item">
+            <span class="label">Total Debit:</span>
+            <span class="value negative">₹{{ debit }}</span>
+        </div>
+    </div>
+
+    <div class="debt-details">
+        <h3>Detailed Balances</h3>
+        {% if data %}
+            <ul class="debt-list">
+                {% for entry in data %}
+                    <li>{{ entry }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No outstanding balances</p>
+        {% endif %}
+    </div>
+</div> {% endcomment %}
+{% endblock %}

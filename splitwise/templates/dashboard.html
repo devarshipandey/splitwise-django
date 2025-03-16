@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="dashboard">
+    <h2>Welcome, {{ user.name }}</h2>
+    
+    <div class="section">
+        <h3>Your Groups</h3>
+        <div class="group-list">
+            {% for group in groups %}
+                <div class="group-card">
+                    <a href="{% url 'group-detail' group.id %}">{{ group.group_name }}</a>
+                    <span class="member-count">{{ group.members.count }} members</span>
+                </div>
+            {% empty %}
+                <p>No groups found. <a href="{% url 'create-group' %}">Create one!</a></p>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% for group in groups %}
+    <div class="group-card">
+        <div class="group-header">
+            <a href="{% url 'group-detail' group.id %}">{{ group.group_name }}</a>
+            <form action="{% url 'delete-group' group.id %}" method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">
+                    Delete Group
+                </button>
+            </form>
+        </div>
+        <span class="member-count">{{ group.members.count }} members</span>
+    </div>
+    {% endfor %}
+
+    <div class="section">
+        <h3>Recent Expenses</h3>
+        <div class="expense-list">
+            {% for expense in expenses %}
+                <div class="expense-card">
+                    <div class="expense-header">
+                        <span class="expense-name">{{ expense.name }}</span>
+                        <span class="expense-amount">₹{{ expense.amount }}</span>
+                    </div>
+                    <p class="expense-description">{{ expense.description }}</p>
+                </div>
+            {% empty %}
+                <p>No expenses recorded yet.</p>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

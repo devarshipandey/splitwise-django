@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="management-container">
+    <h2>User Management</h2>
+    <a href="{% url 'create-user' %}" class="btn btn-success mb-3">
+        + Add New User
+    </a>
+    
+    <div class="user-list">
+        {% for user in users %}
+            <div class="user-card">
+                <div class="user-info">
+                    <span class="user-name">{{ user.name }}</span>
+                    <span class="user-email">{{ user.email }}</span>
+                </div>
+                <div class="user-actions">
+                    <form action="{% url 'delete-user' user.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Delete
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

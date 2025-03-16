@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="payment-container">
+    <h2 class="page-title">💸 Record Payment</h2>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% comment %} <form method="post" class="payment-form" id="paymentForm">
+        {% csrf_token %}
+        
+        <!-- Payer Section -->
+        <div class="payer-section">
+            <h4 class="section-title">Who's Paying?</h4>
+            <div class="current-user-card">
+                <div class="user-info">
+                    <span class="user-name">{{ current_user.name }}</span>
+                    <span class="user-email">{{ current_user.email }}</span>
+                </div>
+                <div class="payment-badge">
+                    <i class="fas fa-wallet"></i> You're paying
+                </div>
+            </div>
+            <input type="hidden" name="from_user" value="{{ current_user.email }}">
+        </div>
+
+        <!-- Debt Selection -->
+        <div class="form-section">
+            <h4 class="section-title">Settle Existing Debt</h4>
+            <div class="form-group">
+                <select id="debtSelector" class="form-control">
+                    <option value="">Select debt to settle</option>
+                    {% for debt in debts %}
+                        <option value="{{ debt.id }}" 
+                            data-email="{{ debt.to_user.email }}"
+                            data-amount="{{ debt.amount }}">
+                            You owe {{ debt.to_user.name }}: ₹{{ debt.amount }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="hidden" name="debt_id" id="debtId">
+        </div>
+
+        <!-- Payee Section -->
+        <div class="form-section">
+            <h4 class="section-title">Payment Receiver</h4>
+            <div class="form-group">
+                <label class="form-label">Payee <span class="required-asterisk">*</span></label>
+                <select name="to_user" class="form-control select-user" required>
+                    <option value="" disabled selected>Select receiver</option>
+                    {% for user in users %}
+                        <option value="{{ user.email }}">
+                            {{ user.name }} ({{ user.email }})
+                        </option>
+                    {% endfor %}
+                </select>
+                <small class="form-text text-muted">Select who should receive this payment</small>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="form-section">
+            <h4 class="section-title">Payment Information</h4>
+            <div class="form-group">
+                <label class="form-label">Amount <span class="required-asterisk">*</span></label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">₹</span>
+                    </div>
+                    <input type="number" name="amount" step="0.01" min="0.01" 
+                           class="form-control" required 
+                           placeholder="Enter amount">
+                </div>
+                <small class="form-text text-muted">Minimum amount: ₹0.01</small>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-check-circle mr-2"></i>Confirm Payment
+            </button>
+            <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+                <i class="fas fa-times-circle mr-2"></i>Cancel
+            </a>
+        </div>
+    </form> {% endcomment %}
+
+    <!-- Debt List Section -->
+    <div class="debt-list-section">
+        <h4 class="section-title">📋 Your Outstanding Debts</h4>
+        
+        {% if debts %}
+            <div class="debt-items">
+                {% for debt in debts %}
+                    <div class="debt-item">
+                        <div class="debt-info">
+                            <div class="debt-meta">
+                                <span class="creditor">
+                                    <i class="fas fa-user-tag"></i>
+                                    {{ debt.to_user.name }}
+                                </span>
+                                <span class="amount">
+                                    ₹{{ debt.amount }}
+                                </span>
+                            </div>
+                            <p class="debt-description">
+                                <i class="fas fa-info-circle"></i>
+                                You owe this amount to {{ debt.to_user.name }}
+                            </p>
+                        </div>
+                        <form method="post" action="{% url 'settle-debt' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="debt_id" value="{{ debt.id }}">
+                            <button type="submit" class="btn settle-btn">
+                                <i class="fas fa-check"></i>Settle
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="no-debts">
+                <i class="fas fa-check-circle"></i>
+                All debts are settled!
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const debtSelector = document.getElementById('debtSelector');
+        const toUserField = document.querySelector('[name="to_user"]');
+        const amountField = document.querySelector('[name="amount"]');
+        const debtIdField = document.getElementById('debtId');
+
+        debtSelector.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption.value) {
+                toUserField.value = selectedOption.dataset.email;
+                amountField.value = selectedOption.dataset.amount;
+                debtIdField.value = selectedOption.value;
+                
+                // Disable manual editing when debt is selected
+                toUserField.disabled = true;
+                amountField.disabled = true;
+            } else {
+                toUserField.disabled = false;
+                amountField.disabled = false;
+                debtIdField.value = '';
+            }
+        });
+    });
+</script>
+{% endblock %}

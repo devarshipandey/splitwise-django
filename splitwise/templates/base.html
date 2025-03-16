@@ -1,0 +1,73 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Splitwise Clone</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <a href="{% url 'dashboard' %}" class="logo">
+                <span class="logo-icon">💰</span>
+                Splitwise
+            </a>
+            <div class="nav-links">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="nav-link">
+                        <span class="nav-icon">🏠</span>
+                        Dashboard
+                    </a>
+                    <a href="{% url 'create-group' %}" class="nav-link">
+                        <span class="nav-icon">👥</span>
+                        Groups
+                    </a>
+                    <a href="{% url 'create-expense' %}" class="nav-link">
+                        <span class="nav-icon">💸</span>
+                        Expenses
+                    </a>
+                    <a href="{% url 'record-payment' %}" class="nav-link">
+                        <span class="nav-icon">💳</span>
+                        Payments
+                    </a>
+                    <div class="user-menu">
+                        <a href="{% url 'user-profile' %}" class="nav-link user-avatar">
+                            👤 {{ user.name }}
+                        </a>
+                        <div class="dropdown-content">
+                            <a href="{% url 'user-profile' %}">Profile</a>
+                            <a href="{% url 'user-management' %}">Manage Users</a>
+                            <a href="{% url 'logout' %}">Logout</a>
+                        </div>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="nav-link">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-btn">&times;</span>
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+
+    <script>
+        // Close alert messages
+        document.querySelectorAll('.close-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.target.parentElement.style.display = 'none';
+            });
+        });
+    </script>
+</body>
+</html>

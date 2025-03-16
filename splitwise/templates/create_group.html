@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="form-container">
+    <h2>Create New Group</h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Group Name:</label>
+            <input type="text" name="group_name" required class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Select Members:</label>
+            <div class="member-select">
+                {% for user in users %}
+                    <div class="member-option">
+                        <label>
+                            <input type="checkbox" name="members" value="{{ user.email }}">
+                            {{ user.name }} ({{ user.email }})
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Group</button>
+    </form>
+    {% if error %}
+        <div class="alert alert-danger">{{ error }}</div>
+    {% endif %}
+</div>
+{% endblock %}

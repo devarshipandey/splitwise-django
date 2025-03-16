@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="group-detail-container">
+    <div class="group-header">
+        <h2>{{ group.group_name }}</h2>
+        <a href="{% url 'dashboard' %}" class="btn btn-secondary">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <div class="group-info">
+        <div class="members-section">
+            <h3>Members ({{ members.count }})</h3>
+            <ul class="member-list">
+                {% for member in members %}
+                    <li class="member-item">
+                        <div class="member-info">
+                            <span class="member-name">{{ member.name }}</span>
+                            <span class="member-email">{{ member.email }}</span>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="expenses-section">
+            <h3>Expenses</h3>
+            {% if expenses %}
+                <div class="expense-list">
+                    {% for expense in expenses %}
+                        <div class="expense-card">
+                            <div class="expense-header">
+                                <span class="expense-name">{{ expense.name }}</span>
+                                <span class="expense-amount">₹{{ expense.amount }}</span>
+                            </div>
+                            <p class="expense-description">{{ expense.description }}</p>
+                            <div class="expense-meta">
+                                <span class="date">{{ expense.date|date:"M d, Y" }}</span>
+                                <span class="status {% if expense.payment %}paid{% else %}pending{% endif %}">
+                                    {% if expense.payment %}Paid{% else %}Pending{% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-expenses">No expenses in this group yet.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
