@@ -125,7 +125,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'splitwise', 'static')
+    os.path.join(BASE_DIR, 'splitwise', 'static')  # Your static folder path
 ]
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build')  # Vercel expects this folder
