@@ -35,6 +35,7 @@ urlpatterns = [
     path('api/debts/', views.UserDebtsApiView.as_view(), name='user-debts'),
     path('record-payment/', views.RecordPaymentApiView.as_view(), name='record-payment'),
     path('settle-debt/', views.settle_debt, name='settle-debt'),
+    path('register/', views.register_view, name='register'),
 ]
 
 if settings.DEBUG:

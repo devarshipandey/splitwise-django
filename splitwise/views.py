@@ -652,3 +652,32 @@ def record_payment(request):
         'current_user': request.user,
         'debts': debts
     })
+
+@require_http_methods(["GET", "POST"])
+def register_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        name = request.POST.get('name')
+        password = request.POST.get('password')
+        
+        try:
+            # Check if email exists
+            if models.UserProfile.objects.filter(email=email).exists():
+                raise ValueError("Email already registered")
+                
+            # Create user
+            user = models.UserProfile.objects.create_user(
+                email=email,
+                name=name,
+                password=password
+            )
+            messages.success(request, 'Registration successful! Please login.')
+            return redirect('login')
+            
+        except Exception as e:
+            return render(request, 'register.html', {'error': str(e)})
+    
+    return render(request, 'register.html')
