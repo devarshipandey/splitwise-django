@@ -38,8 +38,8 @@
                             <p class="expense-description">{{ expense.description }}</p>
                             <div class="expense-meta">
                                 <span class="date">{{ expense.date|date:"M d, Y" }}</span>
-                                <span class="status {% if expense.payment %}paid{% else %}pending{% endif %}">
-                                    {% if expense.payment %}Paid{% else %}Pending{% endif %}
+                                {% comment %} <span class="status {% if expense.payment %}paid{% else %}pending{% endif %}">
+                                    {% if expense.payment %}Paid{% else %}Pending{% endif %} {% endcomment %}
                                 </span>
                             </div>
                         </div>

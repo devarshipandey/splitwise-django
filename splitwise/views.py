@@ -10,6 +10,7 @@ from django.contrib import messages
 from rest_framework.request import Request
 from rest_framework.settings import api_settings
 from rest_framework.parsers import FormParser, MultiPartParser
+from django.db.models import Prefetch
 
 def create_expense_common(data):
     """Shared expense creation logic for both API and frontend"""
@@ -408,12 +409,28 @@ def logout_view(request):
 @login_required
 def dashboard(request):
     try:
-        # Get user's groups and expenses
+        # Get user's groups and expenses with related data
         user_groups = request.user.group_set.all()
         user_expenses = models.Expense.objects.filter(
             users__user=request.user
-        ).select_related('expense_group')
-        
+        ).select_related('expense_group').prefetch_related(
+            Prefetch('users', queryset=models.ExpenseUser.objects.select_related('user'))
+        )
+
+        # Process expenses to identify payers
+        processed_expenses = []
+        for expense in user_expenses:
+            payer = None
+            # Find the user who paid for this expense
+            for expense_user in expense.users.all():
+                if expense_user.paid_share > 0:
+                    payer = expense_user.user
+                    break
+            processed_expenses.append({
+                'expense': expense,
+                'payer': payer.name if payer else "Unknown"
+            })
+
         # Get debt summary using existing API logic
         mock_request = type('', (), {'GET': {'email': request.user.email}})()
         debt_response = ShowUserDetailsApiView().get(mock_request)
@@ -421,14 +438,12 @@ def dashboard(request):
         
         return render(request, 'dashboard.html', {
             'groups': user_groups,
-            'expenses': user_expenses,
+            'processed_expenses': processed_expenses,  # Updated to use processed data
             'debt_data': debt_data
         })
         
     except Exception as e:
         return render(request, 'error.html', {'error': str(e)})
-        # Temporarily use login template for errors until we create error.html
-        return render(request, 'login.html', {'error': f"Dashboard Error: {str(e)}"})
 
 @login_required
 def create_group(request):

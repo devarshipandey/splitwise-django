@@ -17,31 +17,22 @@
         </div>
     </div>
 
-    {% for group in groups %}
-    <div class="group-card">
-        <div class="group-header">
-            <a href="{% url 'group-detail' group.id %}">{{ group.group_name }}</a>
-            <form action="{% url 'delete-group' group.id %}" method="post">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-danger btn-sm">
-                    Delete Group
-                </button>
-            </form>
-        </div>
-        <span class="member-count">{{ group.members.count }} members</span>
-    </div>
-    {% endfor %}
-
     <div class="section">
         <h3>Recent Expenses</h3>
         <div class="expense-list">
-            {% for expense in expenses %}
+            {% for entry in processed_expenses %}
                 <div class="expense-card">
                     <div class="expense-header">
-                        <span class="expense-name">{{ expense.name }}</span>
-                        <span class="expense-amount">₹{{ expense.amount }}</span>
+                        <span class="expense-name">{{ entry.expense.name }}</span>
+                        <span class="expense-amount">₹{{ entry.expense.amount }}</span>
                     </div>
-                    <p class="expense-description">{{ expense.description }}</p>
+                    <div class="expense-details">
+                        <p>Paid by: <strong>{{ entry.payer }}</strong></p>
+                        {% if entry.expense.expense_group %}
+                        <p>Group: {{ entry.expense.expense_group.group_name }}</p>
+                        {% endif %}
+                        <p class="expense-description">{{ entry.expense.description }}</p>
+                    </div>
                 </div>
             {% empty %}
                 <p>No expenses recorded yet.</p>
